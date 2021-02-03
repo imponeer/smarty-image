@@ -1,0 +1,29 @@
+{
+    "name": "imponeer/smarty-image",
+    "description": "Smarty plugin that adds some image related template syntax enchaments",
+    "type": "library",
+    "require": {
+        "php": ">=7.1",
+        "imponeer/smarty-extensions-contracts": "^1.0",
+        "intervention/image": "^2.5",
+        "psr/cache": "^1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raimondas Rimkevičius",
+            "email": "github@mekdrop.name"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Imponeer\\Smarty\\Extensions\\Image\\": "src/"
+        }
+    },
+    "keywords": [
+        "smarty",
+        "image-processing",
+        "image",
+        "smarty-plugins"
+    ]
+}
