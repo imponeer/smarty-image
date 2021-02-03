@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/imponeer/smarty-image.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/a231cf43fba22907f5a3/maintainability)](https://codeclimate.com/github/imponeer/smarty-image/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net) 
+[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/c284ca86c6df6e98b9d0/maintainability)](https://codeclimate.com/github/imponeer/smarty-image/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net) 
 [![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-image.svg)](https://packagist.org/packages/imponeer/smarty-image)
 
 # Smarty Image

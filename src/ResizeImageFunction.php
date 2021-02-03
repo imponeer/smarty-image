@@ -2,17 +2,18 @@
 
 namespace Imponeer\Smarty\Extensions\Image;
 
-use Intervention\Image\ImageManager;
+use Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface;
 use Intervention\Image\ImageManagerStatic as Image;
 use Psr\Cache\CacheItemPoolInterface;
 use Smarty_Internal_Template;
+use SmartyCompilerException;
 
 /**
  * Describes {resize_image} smarty function
  *
  * @package Imponeer\Smarty\Extensions\Image
  */
-class ResizeImageFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface
+class ResizeImageFunction implements SmartyFunctionInterface
 {
     /**
      * @var CacheItemPoolInterface
@@ -187,77 +188,58 @@ class ResizeImageFunction implements \Imponeer\Contracts\Smarty\Extension\Smarty
      * @param array $otherParams Params with params that doesnt  have specific role
      * @param Smarty_Internal_Template $template Current smarty instance
      *
-     * @throws \SmartyCompilerException
+     * @throws SmartyCompilerException
      */
     protected function validateParams(array $params, array $otherParams, Smarty_Internal_Template $template)
     {
         if (!isset($params['file'])) {
-            $template->compiler->trigger_template_error(
-              'resize_image requires "file" argument',
-              null,
-              true
-            );
-        }
-
-        if (empty($params['file'])) {
-            $template->trigger_template_error(
-                'resize_image requires "file" to be not empty',
-                null,
-                true
-            );
-        }
-
-        if (!is_string($params['file'])) {
-            $template->trigger_template_error(
-                'resize_image requires "file" must be a string',
-                null,
-                true
-            );
+            $template->compiler->trigger_template_error('resize_image requires "file" argument', null, true);
+        } elseif (empty($params['file'])) {
+            $template->compiler->trigger_template_error('resize_image requires "file" to be not empty', null, true);
+        } elseif (!is_string($params['file'])) {
+            $template->compiler->trigger_template_error('resize_image requires "file" must be a string', null, true);
         }
 
         if (isset($params['width']) && !is_numeric($params['width'])) {
-            $template->compiler->trigger_template_error(
-                'resize_image "width" argument must be numeric',
-                null,
-                true
-            );
+            $template->compiler->trigger_template_error('resize_image "width" argument must be numeric', null, true);
         }
 
         if (isset($params['height']) && !is_numeric($params['height'])) {
-            $template->compiler->trigger_template_error(
-                'resize_image "height" argument must be numeric',
-                null,
-                true
-            );
+            $template->compiler->trigger_template_error('resize_image "height" argument must be numeric', null, true);
         }
 
         if (isset($params['fit']) && in_array(strtolower($params['fit']), ['inside', 'outside', 'fill'], true)) {
-            $template->compiler->trigger_template_error(
-                'resize_image "fill" argument must have "inside", "outside" or "fill" value',
-                null,
-                true
-            );
+            $template->compiler->trigger_template_error('resize_image "fill" argument must have "inside", "outside" or "fill" value', null, true);
         }
 
         if (isset($params['return']) && $params['return'] === 'image') {
-            foreach ($otherParams as $key => $value) {
-                if (isset($value) && !is_string($value)) {
-                    $template->compiler->trigger_template_error(
-                        'resize_image "'.$key.'" argument must be a string',
-                        null,
-                        true
-                    );
-                }
-            }
+            $this->validateImageOtherParams($otherParams, $template);
         }
 
         if (!isset($params['width']) && !isset($params['height'])) {
+            $template->compiler->trigger_template_error('resized_image needs width or height param to be specified', null, true);
+        }
+    }
+
+    /**
+     * Validates other params for image return type
+     *
+     * @param array $otherParams Other params array
+     * @param Smarty_Internal_Template $template Current smarty instance
+     *
+     * @throws SmartyCompilerException
+     */
+    protected function validateImageOtherParams(array $otherParams, Smarty_Internal_Template $template)
+    {
+        foreach ($otherParams as $key => $value) {
+            if (!isset($value) || is_string($value)) {
+                continue;
+            }
             $template->compiler->trigger_template_error(
-                'resized_image needs width or height param to be specified',
+                'resize_image "' . $key . '" argument must be a string',
                 null,
                 true
             );
-            return;
         }
     }
 
