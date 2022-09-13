@@ -21,7 +21,7 @@ Otherwise, you need to include manually files from `src/` directory.
 If you want to use these extensions from this package in your project you need register them with [`registerPlugin` function](https://www.smarty.net/docs/en/api.register.plugin.tpl) from [Smarty](https://www.smarty.net). For example:
 ```php
 $smarty = new \Smarty();
-$resizeImagePlugin = new \Imponeer\Smarty\Extensions\Image\$resizeImagePlugin($psrCacheAdapter);
+$resizeImagePlugin = new \Imponeer\Smarty\Extensions\Image\ResizeImageFunction($psrCacheAdapter);
 $smarty->registerPlugin('function', $resizeImagePlugin->getName(), [$resizeImagePlugin, 'execute']);
 ```
 
