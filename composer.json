@@ -3,10 +3,11 @@
     "description": "Smarty plugin that adds some image related template syntax enchaments",
     "type": "library",
     "require": {
-        "php": ">=7.1",
-        "imponeer/smarty-extensions-contracts": "^1.0 || ^2.0",
+        "php": "^7.3|^8.0",
+        "imponeer/smarty-extensions-contracts": "^3.0",
         "intervention/image": "^2.5",
-        "psr/cache": "^1.0"
+        "psr/cache": "^2.0|^3.0",
+        "ext-json": "*"
     },
     "license": "MIT",
     "authors": [
@@ -25,5 +26,15 @@
         "image-processing",
         "image",
         "smarty-plugins"
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^8.0",
+        "symfony/cache": "^5.0|^6.0",
+        "bentools/cartesian-product": "^1.3",
+        "symfony/polyfill-php80": "^1.27",
+        "symfony/dom-crawler": "^5.0|^6.0"
+    },
+    "scripts": {
+        "test": "phpunit --testdox --stop-on-error --stop-on-failure"
+    }
 }
