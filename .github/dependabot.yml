@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 20
     labels:
       - "dependencies"
       - "composer"
@@ -15,3 +15,4 @@ updates:
     labels:
       - "dependencies"
       - "infrastructure"
+    open-pull-requests-limit: 20
