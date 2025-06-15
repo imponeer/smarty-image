@@ -15,8 +15,8 @@ jobs:
         php:
           - 8.3
           - 8.4
-        composer: 
-          - 2  
+        composer:
+          - 2
     name: Test - php:${{ matrix.php }}; composer:${{ matrix.composer }}
     steps:
       - name: Checkout
@@ -32,11 +32,13 @@ jobs:
         run: composer validate --strict --no-check-lock
       - name: Install Composer dependencies (with dev)
         run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+      - name: PHPCS
+        run: composer phpcs
       - name: PHPUnit
         run: composer test
       - name: Install Composer dependencies (without dev)
         run: composer install --no-progress --no-dev --no-suggest --prefer-dist --optimize-autoloader
-        
+
   dependabot:
     needs: tests
     permissions:
@@ -67,4 +69,4 @@ jobs:
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

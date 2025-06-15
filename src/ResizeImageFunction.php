@@ -97,8 +97,8 @@ class ResizeImageFunction implements SmartyFunctionInterface
      */
     protected function fixParams(array &$params): void
     {
-        $params['width'] = isset($params['width']) ? (int)$params['width'] : null;
-        $params['height'] = isset($params['height']) ? (int)$params['height'] : null;
+        $params['width'] = isset($params['width']) ? (int) $params['width'] : null;
+        $params['height'] = isset($params['height']) ? (int) $params['height'] : null;
         $params['fit'] = isset($params['fit']) ? strtolower($params['fit']) : 'outside';
         $params['return'] = isset($params['return']) ? strtolower($params['return']) : 'image';
 
@@ -142,7 +142,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
         }
 
         if ($return === 'url') {
-            return (string)$image->encode('data-url');
+            return (string) $image->encode('data-url');
         }
 
         return '???';
@@ -166,7 +166,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
 
         $allAttributes = $otherParams + [
                 'alt' => '',
-                'src' => (string)$image->encode('data-url')
+                'src' => (string) $image->encode('data-url')
             ];
 
         if (isset($allAttributes['link'])) {
@@ -332,7 +332,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
             if (in_array($k, ['fit', 'width', 'height', 'return', 'file', 'src'])) {
                 continue;
             }
-            $ret[$k] = (string)$value;
+            $ret[$k] = (string) $value;
         }
 
         return $ret;

@@ -11,5 +11,4 @@ class AttributeEmptyException extends SmartyException
     {
         parent::__construct("resized_image requires \"$attribute\" to be not empty", $code, $previous);
     }
-
 }
