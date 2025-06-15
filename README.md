@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/imponeer/smarty-image.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/c284ca86c6df6e98b9d0/maintainability)](https://codeclimate.com/github/imponeer/smarty-image/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net) 
+[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/c284ca86c6df6e98b9d0/maintainability)](https://codeclimate.com/github/imponeer/smarty-image/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net)
 [![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-image.svg)](https://packagist.org/packages/imponeer/smarty-image)
 
 # Smarty Image
@@ -14,16 +14,21 @@ To install and use this package, we recommend to use [Composer](https://getcompo
 composer require imponeer/smarty-image
 ```
 
-Otherwise, you need to include manually files from `src/` directory. 
+Otherwise, you need to include manually files from `src/` directory.
 
 ## Registering in Smarty
 
-If you want to use these extensions from this package in your project you need register them with [`registerPlugin` function](https://www.smarty.net/docs/en/api.register.plugin.tpl) from [Smarty](https://www.smarty.net). For example:
+For Smarty v5 and never, use the new extension system:
+
 ```php
-$smarty = new \Smarty();
-$resizeImagePlugin = new \Imponeer\Smarty\Extensions\Image\ResizeImageFunction($psrCacheAdapter);
-$smarty->registerPlugin('function', $resizeImagePlugin->getName(), [$resizeImagePlugin, 'execute']);
+$smarty = new \Smarty\Smarty();
+// For $psrCacheAdapter value use PSR-16 cache adapter, for example Symfony\Component\Cache\Adapter\ArrayAdapter
+$smarty->addExtension(
+    new \Imponeer\Smarty\Extensions\Image\SmartyImageExtension($psrCacheAdapter)
+);
 ```
+
+For older Smarty use [v2.0 version of this plugin](https://github.com/imponeer/smarty-image/tree/v2.0.2).
 
 ## Using from templates
 
@@ -40,7 +45,7 @@ This function supports such arguments:
 | `width`    | if `height` is not specified | | Resized image width |
 | `height`   | if `width` is not specified | | Resized image height |
 | `fit`     | no | `outside` | Method used for resize. Supported `fill`, `inside`, `outside` |
-| `href` or `link`    | no | | if specified and `return` is set to `image`, will output generated HTML as image with link to this specific location | 
+| `href` or `link`    | no | | if specified and `return` is set to `image`, will output generated HTML as image with link to this specific location |
 | `basedir` | no | $_SERVER['DOCUMENT_ROOT'] | Base dir where to look for image files |
 | `return` | no | `image` | Returns result as HTML tag if value is `image`, or as resized image URI if value is `url`.  |
 

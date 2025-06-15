@@ -1,94 +1,36 @@
 <?php
 
-namespace Imponeer\Smarty\Extensions\Image;
+namespace Imponeer\Smarty\Extensions\Image\Functions;
 
-use Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface;
+use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeEmptyException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeNumericException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
-use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
-use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Image as SingleImage;
 use Intervention\Image\ImageManagerStatic as Image;
-use JsonException;
+use Override;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Smarty_Internal_Template;
-use SmartyCompilerException;
+use Smarty\FunctionHandler\FunctionHandlerInterface;
+use Smarty\Template;
 
 /**
  * Describes {resize_image} smarty function
  *
  * @package Imponeer\Smarty\Extensions\Image
  */
-class ResizeImageFunction implements SmartyFunctionInterface
+class ResizeImageFunction implements FunctionHandlerInterface
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
-
     /**
      * ResizeImageFunction constructor.
      *
      * @param CacheItemPoolInterface $cache
      */
-    public function __construct(CacheItemPoolInterface $cache)
-    {
-        $this->cache = $cache;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return 'resized_image';
-    }
-
-    /**
-     * @inheritDoc
-     *
-     * @param array<string, mixed> $params Parameters used to call function
-     * @param Smarty_Internal_Template $template Current smarty object instance
-     *
-     * @throws AttributeEmptyException
-     * @throws AttributeMustBeNumericException
-     * @throws AttributeMustBeStringException
-     * @throws BadFitValueException
-     * @throws InvalidArgumentException
-     * @throws NotReadableException
-     * @throws AtLeastWidthOrHeightMustBeUsedException
-     * @throws RequiredArgumentException
-     */
-    public function execute($params, Smarty_Internal_Template $template)
-    {
-        $otherParams = $this->getOtherParams($params);
-
-        $this->validateParams($params, $otherParams, $template);
-
-        $this->fixParams($params);
-        $this->fixOtherParams($otherParams);
-
-        $encodedStr = serialize($params);
-        /** @noinspection SpellCheckingInspection */
-        $cacheKey = 'imponeer-spri-' . md5($encodedStr) . '-' . strlen($encodedStr);
-        $cachedItem = $this->cache->getItem($cacheKey);
-
-        if (!$cachedItem->isHit()) {
-            $cachedItem->set(
-                $this->renderOutput(
-                    $params['return'],
-                    $this->doResize($params['fit'], $params['file'], $params['width'], $params['height']),
-                    $otherParams
-                )
-            );
-            $this->cache->save($cachedItem);
-        }
-
-        return $cachedItem->get();
+    public function __construct(
+        private readonly CacheItemPoolInterface $cache
+    ) {
     }
 
     /**
@@ -106,7 +48,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
         $params['return'] = isset($params['return']) ? strtolower($params['return']) : 'image';
 
         if (
-            (strpos($params['file'], 'data:') !== 0) &&
+            !str_starts_with($params['file'], 'data:') &&
             !filter_var($params['file'], FILTER_VALIDATE_URL) &&
             !file_exists($params['file'])
         ) {
@@ -261,7 +203,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
      *
      * @param array<string, mixed> $params Current function arguments (aka params) to be validated
      * @param array<string, mixed> $otherParams Params with params that doesnt  have specific role
-     * @param Smarty_Internal_Template $template Current smarty instance
+     * @param Template $template Current smarty instance
      *
      * @throws RequiredArgumentException
      * @throws AttributeEmptyException
@@ -270,7 +212,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
      * @throws BadFitValueException
      * @throws AtLeastWidthOrHeightMustBeUsedException
      */
-    protected function validateParams(array $params, array $otherParams, Smarty_Internal_Template $template): void
+    protected function validateParams(array $params, array $otherParams, Template $template): void
     {
         if (!isset($params['file'])) {
             throw new RequiredArgumentException('file');
@@ -309,11 +251,11 @@ class ResizeImageFunction implements SmartyFunctionInterface
      * Validates other params for image return type
      *
      * @param array<string, mixed> $otherParams Other params array
-     * @param Smarty_Internal_Template $template Current smarty instance
+     * @param Template $template Current smarty instance
      *
      * @throws AttributeMustBeStringException
      */
-    protected function validateImageOtherParams(array $otherParams, Smarty_Internal_Template $template): void
+    protected function validateImageOtherParams(array $otherParams, Template $template): void
     {
         foreach ($otherParams as $key => $value) {
             if (!isset($value) || is_string($value)) {
@@ -343,5 +285,55 @@ class ResizeImageFunction implements SmartyFunctionInterface
         }
 
         return $ret;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return string
+     *
+     * @throws InvalidArgumentException
+     * @throws AttributeMustBeStringException
+     * @throws BadFitValueException
+     * @throws RequiredArgumentException
+     * @throws AttributeEmptyException
+     * @throws AtLeastWidthOrHeightMustBeUsedException
+     * @throws AttributeMustBeNumericException
+     *
+     * @noinspection MissingParameterTypeDeclarationInspection
+     * @noinspection MissingReturnTypeInspection
+     */
+    #[Override]
+    public function handle($params, Template $template)
+    {
+        $otherParams = $this->getOtherParams($params);
+
+        $this->validateParams($params, $otherParams, $template);
+
+        $this->fixParams($params);
+        $this->fixOtherParams($otherParams);
+
+        $encodedStr = serialize($params);
+        /** @noinspection SpellCheckingInspection */
+        $cacheKey = 'imponeer-spri-' . md5($encodedStr) . '-' . strlen($encodedStr);
+        $cachedItem = $this->cache->getItem($cacheKey);
+
+        if (!$cachedItem->isHit()) {
+            $cachedItem->set(
+                $this->renderOutput(
+                    $params['return'],
+                    $this->doResize($params['fit'], $params['file'], $params['width'], $params['height']),
+                    $otherParams
+                )
+            );
+            $this->cache->save($cachedItem);
+        }
+
+        return $cachedItem->get();
+    }
+
+    public function isCacheable(): bool
+    {
+        return false;
     }
 }
