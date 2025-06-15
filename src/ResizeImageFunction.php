@@ -51,6 +51,9 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * @inheritDoc
      *
+     * @param array<string, mixed> $params Parameters used to call function
+     * @param Smarty_Internal_Template $template Current smarty object instance
+     *
      * @throws AttributeEmptyException
      * @throws AttributeMustBeNumericException
      * @throws AttributeMustBeStringException
@@ -91,7 +94,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * Applies some fixes to params values
      *
-     * @param array $params Params to fix
+     * @param array<string, mixed> $params Params to fix
      *
      * @return void
      */
@@ -114,7 +117,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * Applies some fixes to other-params values
      *
-     * @param array $params Other-params to fix
+     * @param array<string, mixed> $params Other-params to fix
      *
      * @return void
      */
@@ -131,7 +134,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
      *
      * @param string $return Return format
      * @param SingleImage $image Image for the output
-     * @param array $otherParams Other params
+     * @param array<string, mixed> $otherParams Other params
      *
      * @return string
      */
@@ -152,7 +155,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
      * Renders HTML IMG tag for the image
      *
      * @param SingleImage $image Image to be returned for output
-     * @param array $otherParams Some params
+     * @param array<string, mixed> $otherParams Some params
      *
      * @return string
      */
@@ -194,7 +197,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
      * Builds HTML tag
      *
      * @param string $name Tag name
-     * @param array $attributes Dictionary of tag attributes
+     * @param array<string, mixed> $attributes Dictionary of tag attributes
      * @param bool $quickCloseTag Is tag should be quick close tag?
      *
      * @return string
@@ -243,7 +246,11 @@ class ResizeImageFunction implements SmartyFunctionInterface
                     $constraint->aspectRatio();
                 });
             case 'outside':
-                return $image->fit($width, $height);
+                // For 'outside' fit, we need both width and height
+                // If one is missing, use the image's original dimensions
+                $finalWidth = $width ?? $image->width();
+                $finalHeight = $height ?? $image->height();
+                return $image->fit($finalWidth, $finalHeight);
         }
 
         return $image;
@@ -252,8 +259,8 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * Validates params
      *
-     * @param array $params Current function arguments (aka params) to be validated
-     * @param array $otherParams Params with params that doesnt  have specific role
+     * @param array<string, mixed> $params Current function arguments (aka params) to be validated
+     * @param array<string, mixed> $otherParams Params with params that doesnt  have specific role
      * @param Smarty_Internal_Template $template Current smarty instance
      *
      * @throws RequiredArgumentException
@@ -301,7 +308,7 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * Validates other params for image return type
      *
-     * @param array $otherParams Other params array
+     * @param array<string, mixed> $otherParams Other params array
      * @param Smarty_Internal_Template $template Current smarty instance
      *
      * @throws AttributeMustBeStringException
@@ -320,9 +327,9 @@ class ResizeImageFunction implements SmartyFunctionInterface
     /**
      * Gets array from params that doesn't have any specific role
      *
-     * @param array $params Smarty function supplied arguments
+     * @param array<string, mixed> $params Smarty function supplied arguments
      *
-     * @return array
+     * @return array<string, string>
      */
     private function getOtherParams(array $params): array
     {
