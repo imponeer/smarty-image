@@ -3,7 +3,7 @@
     "description": "Smarty plugin that adds some image related template syntax enchaments",
     "type": "library",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^8.3",
         "imponeer/smarty-extensions-contracts": "^3.0",
         "intervention/image": "^2.5",
         "psr/cache": "^1.0|^2.0|^3.0",
