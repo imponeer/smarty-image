@@ -2,6 +2,7 @@
 
 namespace Imponeer\Smarty\Extensions\Image;
 
+use Imponeer\Smarty\Extensions\Image\Functions\ResizeImageFunction;
 use Psr\Cache\CacheItemPoolInterface;
 use Smarty\Extension\Base;
 use Smarty\FunctionHandler\FunctionHandlerInterface;

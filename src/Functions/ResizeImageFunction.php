@@ -1,12 +1,12 @@
 <?php
 
-namespace Imponeer\Smarty\Extensions\Image;
+namespace Imponeer\Smarty\Extensions\Image\Functions;
 
+use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeEmptyException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeNumericException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
-use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Intervention\Image\Image as SingleImage;
 use Intervention\Image\ImageManagerStatic as Image;
