@@ -8,12 +8,13 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Imponeer\Smarty\Extensions\Image\ResizeImageFunction;
+use Imponeer\Smarty\Extensions\Image\SmartyImageExtension;
 use Intervention\Image\Exception\NotReadableException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\FileDoesNotExistException;
-use Smarty;
-use SmartyException;
+use Smarty\Exception;
+use Smarty\Smarty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -21,33 +22,17 @@ use function BenTools\CartesianProduct\cartesian_product;
 
 class ResizeImageFunctionTest extends TestCase
 {
-
     private Smarty $smarty;
-    private ResizeImageFunction $plugin;
 
     protected function setUp(): void
     {
-        $this->plugin = new ResizeImageFunction(
-            new ArrayAdapter()
-        );
-
         $this->smarty = new Smarty();
         $this->smarty->caching = Smarty::CACHING_OFF;
-        $this->smarty->registerPlugin(
-            'function',
-            $this->plugin->getName(),
-            [$this->plugin, 'execute']
+        $this->smarty->addExtension(
+            new SmartyImageExtension(new ArrayAdapter())
         );
 
         parent::setUp();
-    }
-
-    public function testGetName(): void
-    {
-        $this->assertSame(
-            'resized_image',
-            $this->plugin->getName()
-        );
     }
 
     /**
@@ -145,7 +130,7 @@ class ResizeImageFunctionTest extends TestCase
     /**
      * @param array<string, mixed> $attrs
      */
-    protected function renderTag(array $attrs): string
+    private function renderTag(array $attrs): string
     {
         $ret = '{resized_image';
         foreach ($attrs as $k => $v) {
@@ -159,7 +144,7 @@ class ResizeImageFunctionTest extends TestCase
     /**
      * @param array<string, mixed> $attrs
      *
-     * @throws SmartyException
+     * @throws Exception
      */
     #[DataProvider('getInvokeData')]
     public function testInvoke(array $attrs): void

@@ -2,9 +2,9 @@
 
 namespace Imponeer\Smarty\Extensions\Image\Exceptions;
 
-use SmartyException;
+use Smarty\Exception;
 
-class BadFitValueException extends SmartyException
+class BadFitValueException extends Exception
 {
     /** @var string */
     protected $message = 'resized_image "fit" argument must have "inside", "outside" or "fill" value';

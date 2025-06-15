@@ -2,10 +2,10 @@
 
 namespace Imponeer\Smarty\Extensions\Image\Exceptions;
 
-use SmartyException;
+use Smarty\Exception;
 use Throwable;
 
-class AttributeEmptyException extends SmartyException
+class AttributeEmptyException extends Exception
 {
     public function __construct(string $attribute, int $code = 0, ?Throwable $previous = null)
     {
