@@ -9,8 +9,11 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\AtLeastWidthOrHeightMustBeUsedEx
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Imponeer\Smarty\Extensions\Image\ResizeImageFunction;
 use Intervention\Image\Exception\NotReadableException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\FileDoesNotExistException;
 use Smarty;
+use SmartyException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -18,14 +21,8 @@ use function BenTools\CartesianProduct\cartesian_product;
 
 class ResizeImageFunctionTest extends TestCase
 {
-    /**
-     * @var Smarty
-     */
-    private $smarty;
-    /**
-     * @var ResizeImageFunction
-     */
-    private $plugin;
+    private Smarty $smarty;
+    private ResizeImageFunction $plugin;
 
     protected function setUp(): void
     {
@@ -52,8 +49,19 @@ class ResizeImageFunctionTest extends TestCase
         );
     }
 
-    public function getInvokeData(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getInvokeData(): array
     {
+        $content = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'test.jpg');
+
+        if ($content === false) {
+            throw new FileDoesNotExistException(
+                __DIR__ . DIRECTORY_SEPARATOR . 'test.jpg'
+            );
+        }
+
         $combinator = cartesian_product([
             'width' => [
                 null,
@@ -95,11 +103,7 @@ class ResizeImageFunctionTest extends TestCase
                 'test.jpg',
                 realpath(__DIR__ . DIRECTORY_SEPARATOR . 'test.jpg'),
                 //'https://upload.wikimedia.org/wikipedia/commons/8/85/Impresscms_admin_screenshot.jpg',
-                'data:image/jpeg;base64,' . base64_encode(
-                    file_get_contents(
-                        realpath(__DIR__ . DIRECTORY_SEPARATOR . 'test.jpg')
-                    )
-                ),
+                'data:image/jpeg;base64,' . base64_encode($content),
                 99
             ],
         ]);
@@ -137,6 +141,9 @@ class ResizeImageFunctionTest extends TestCase
         return $ret;
     }
 
+    /**
+     * @param array<string, mixed> $attrs
+     */
     protected function renderTag(array $attrs): string
     {
         $ret = '{resized_image';
@@ -149,8 +156,11 @@ class ResizeImageFunctionTest extends TestCase
     }
 
     /**
-     * @dataProvider getInvokeData
+     * @param array<string, mixed> $attrs
+     *
+     * @throws SmartyException
      */
+    #[DataProvider('getInvokeData')]
     public function testInvoke(array $attrs): void
     {
         $src = urlencode(
@@ -171,7 +181,7 @@ class ResizeImageFunctionTest extends TestCase
         } elseif (!isset($attrs['height']) && !isset($attrs['width'])) {
             $this->expectException(AtLeastWidthOrHeightMustBeUsedException::class);
         } elseif (
-            (strpos($attrs['file'], 'data:') !== 0) &&
+            !str_starts_with($attrs['file'], 'data:') &&
             !filter_var($attrs['file'], FILTER_VALIDATE_URL) &&
             !file_exists($attrs['file']) &&
             !file_exists(
@@ -191,7 +201,11 @@ class ResizeImageFunctionTest extends TestCase
             $this->assertSame(1, $imgs->count(), 'Response should return <img /> tag, but returned something else.');
             $this->assertEmpty($imgs->attr('alt'), "<img /> tag should be returned with empty alt");
             $this->assertNotEmpty($imgs->attr('src'), "<img /> tag should be returned with non-empty src");
-            $this->assertStringStartsWith('data:', $imgs->attr('src'), "<img /> should return data: type src");
+            $this->assertStringStartsWith(
+                'data:',
+                $imgs->attr('src') ?? '',
+                "<img /> should return data: type src"
+            );
             $this->assertNull($imgs->attr('link'), '<img /> should not have "link" attribute');
             $this->assertNull($imgs->attr('href'), '<img /> should not have "href" attribute');
             $this->assertNull($imgs->attr('basedir'), '<img /> should not have "basedir" attribute');
