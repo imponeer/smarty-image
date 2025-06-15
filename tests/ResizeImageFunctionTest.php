@@ -21,7 +21,6 @@ use function BenTools\CartesianProduct\cartesian_product;
 
 class ResizeImageFunctionTest extends TestCase
 {
-
     private Smarty $smarty;
     private ResizeImageFunction $plugin;
 
