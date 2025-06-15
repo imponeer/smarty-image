@@ -1,5 +1,7 @@
 <?php
 
+namespace Imponeer\Smarty\Extensions\Image\Tests;
+
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeNumericException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
@@ -8,13 +10,14 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Imponeer\Smarty\Extensions\Image\ResizeImageFunction;
 use Intervention\Image\Exception\NotReadableException;
 use PHPUnit\Framework\TestCase;
+use Smarty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DomCrawler\Crawler;
+
 use function BenTools\CartesianProduct\cartesian_product;
 
 class ResizeImageFunctionTest extends TestCase
 {
-
     /**
      * @var Smarty
      */
@@ -106,7 +109,7 @@ class ResizeImageFunctionTest extends TestCase
             $attrs = array_filter($combination);
 
             $label = [];
-            foreach($attrs as $k => $v) {
+            foreach ($attrs as $k => $v) {
                 if (str_starts_with($v, 'https://') || str_starts_with($v, 'http://')) {
                     $label[] = $k . '=URL';
                 } elseif (str_starts_with($v, 'data:')) {
@@ -178,7 +181,7 @@ class ResizeImageFunctionTest extends TestCase
             $this->expectException(NotReadableException::class);
         }
 
-        $ret = $this->smarty->fetch('eval:urlencode:'.$src);
+        $ret = $this->smarty->fetch('eval:urlencode:' . $src);
 
         if (!isset($attrs['return']) || ($attrs['return'] === 'image')) {
             $crawler = new Crawler($ret);
@@ -194,14 +197,30 @@ class ResizeImageFunctionTest extends TestCase
             $this->assertNull($imgs->attr('basedir'), '<img /> should not have "basedir" attribute');
             if (isset($attrs['href'])) {
                 $links = $crawler->filterXPath('//body/a');
-                $this->assertSame(1, $links->count(), "Because 'href' attribute specified, <a /> tag should also returned");
-                $this->assertSame($attrs['href'], $links->attr('href'), "Returned link should have same 'href' as specified 'href'");
+                $this->assertSame(
+                    1,
+                    $links->count(),
+                    "Because 'href' attribute specified, <a /> tag should also returned"
+                );
+                $this->assertSame(
+                    $attrs['href'],
+                    $links->attr('href'),
+                    "Returned link should have same 'href' as specified 'href'"
+                );
                 $this->assertSame(1, $links->children()->count(), 'The link should have one children (1)');
             }
             if (isset($attrs['link'])) {
                 $links = $crawler->filterXPath('//body/a');
-                $this->assertSame(1, $links->count(), "Because 'link' attribute specified, <a /> tag should also returned");
-                $this->assertSame($attrs['link'], $links->attr('href'), "Returned link should have same 'href' as specified 'link'");
+                $this->assertSame(
+                    1,
+                    $links->count(),
+                    "Because 'link' attribute specified, <a /> tag should also returned"
+                );
+                $this->assertSame(
+                    $attrs['link'],
+                    $links->attr('href'),
+                    "Returned link should have same 'href' as specified 'link'"
+                );
                 $this->assertSame(1, $links->children()->count(), 'The link should have one children (2)');
             }
         } elseif ($attrs['return'] === 'url') {
@@ -210,5 +229,4 @@ class ResizeImageFunctionTest extends TestCase
             $this->assertSame('???', $ret, "If unknown return is specified, result should be '???'");
         }
     }
-
 }
