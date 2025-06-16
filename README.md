@@ -1,6 +1,4 @@
-[![License](https://img.shields.io/github/license/imponeer/smarty-image.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net)
-[![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-image.svg)](https://packagist.org/packages/imponeer/smarty-image) [![Smarty version requirement](https://img.shields.io/packagist/dependency-v/imponeer/smarty-image/smarty%2Fsmarty)](https://smarty-php.github.io)
+[![License](https://img.shields.io/github/license/imponeer/smarty-image.svg)](LICENSE) [![GitHub release](https://img.shields.io/github/release/imponeer/smarty-image.svg)](https://github.com/imponeer/smarty-image/releases) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-image.svg)](http://php.net) [![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-image.svg)](https://packagist.org/packages/imponeer/smarty-image) [![Smarty version requirement](https://img.shields.io/packagist/dependency-v/imponeer/smarty-image/smarty%2Fsmarty)](https://smarty-php.github.io)
 
 # Smarty Image
 
