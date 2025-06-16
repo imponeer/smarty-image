@@ -8,7 +8,7 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Imponeer\Smarty\Extensions\Image\SmartyImageExtension;
-use Intervention\Image\Exception\NotReadableException;
+use Intervention\Image\Exceptions\DecoderException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\FileDoesNotExistException;
@@ -173,7 +173,7 @@ class ResizeImageFunctionTest extends TestCase
                 ($attrs['basedir'] ?? $_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . $attrs['file']
             )
         ) {
-            $this->expectException(NotReadableException::class);
+            $this->expectException(DecoderException::class);
         }
 
         $ret = $this->smarty->fetch('eval:urlencode:' . $src);
