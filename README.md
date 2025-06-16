@@ -22,7 +22,7 @@ For Smarty v5 and newer, use the new extension system:
 
 ```php
 $smarty = new \Smarty\Smarty();
-// For $psrCacheAdapter value use PSR-16 cache adapter, for example Symfony\Component\Cache\Adapter\ArrayAdapter
+// For $psrCacheAdapter value use PSR-6 cache adapter, for example Symfony\Component\Cache\Adapter\ArrayAdapter
 $smarty->addExtension(
     new \Imponeer\Smarty\Extensions\Image\SmartyImageExtension($psrCacheAdapter)
 );
