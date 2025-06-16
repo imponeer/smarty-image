@@ -8,8 +8,9 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeNumericException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
-use Intervention\Image\Image as SingleImage;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Interfaces\ImageInterface;
 use Override;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -23,14 +24,20 @@ use Smarty\Template;
  */
 class ResizeImageFunction implements FunctionHandlerInterface
 {
+    private readonly ImageManager $imageManager;
+
     /**
      * ResizeImageFunction constructor.
      *
-     * @param CacheItemPoolInterface $cache
+     * @param CacheItemPoolInterface $cache Cache pool to use for caching images
+     * @param ImageManager|null $imageManager If custom image manager is needed, it can be specified here, otherwise
+     *                                        default GD based will be used
      */
     public function __construct(
-        private readonly CacheItemPoolInterface $cache
+        private readonly CacheItemPoolInterface $cache,
+        ?ImageManager $imageManager = null,
     ) {
+        $this->imageManager = $imageManager ?? new ImageManager(new Driver());
     }
 
     /**
@@ -75,19 +82,19 @@ class ResizeImageFunction implements FunctionHandlerInterface
      * Renders output string
      *
      * @param string $return Return format
-     * @param SingleImage $image Image for the output
+     * @param ImageInterface $image Image for the output
      * @param array<string, mixed> $otherParams Other params
      *
      * @return string
      */
-    protected function renderOutput(string $return, SingleImage $image, array $otherParams): string
+    protected function renderOutput(string $return, ImageInterface $image, array $otherParams): string
     {
         if ($return === 'image') {
             return $this->renderImageTag($image, $otherParams);
         }
 
         if ($return === 'url') {
-            return (string) $image->encode('data-url');
+            return $image->encode()->toDataUri();
         }
 
         return '???';
@@ -96,12 +103,12 @@ class ResizeImageFunction implements FunctionHandlerInterface
     /**
      * Renders HTML IMG tag for the image
      *
-     * @param SingleImage $image Image to be returned for output
+     * @param ImageInterface $image Image to be returned for output
      * @param array<string, mixed> $otherParams Some params
      *
      * @return string
      */
-    protected function renderImageTag(SingleImage $image, array $otherParams): string
+    protected function renderImageTag(ImageInterface $image, array $otherParams): string
     {
         $ret = '';
 
@@ -111,7 +118,7 @@ class ResizeImageFunction implements FunctionHandlerInterface
 
         $allAttributes = $otherParams + [
                 'alt' => '',
-                'src' => (string) $image->encode('data-url')
+                'src' => $image->encode()->toDataUri()
             ];
 
         if (isset($allAttributes['link'])) {
@@ -167,11 +174,11 @@ class ResizeImageFunction implements FunctionHandlerInterface
      * @param int|null $width New image width
      * @param int|null $height New image height
      *
-     * @return SingleImage
+     * @return ImageInterface
      */
-    protected function doResize(string $method, string $file, ?int $width, ?int $height): SingleImage
+    protected function doResize(string $method, string $file, ?int $width, ?int $height): ImageInterface
     {
-        $image = Image::make($file);
+        $image = $this->imageManager->read($file);
 
         switch ($method) {
             case 'fill':
@@ -179,23 +186,20 @@ class ResizeImageFunction implements FunctionHandlerInterface
             case 'inside':
                 if ($width && $height) {
                     if ($image->width() > $image->height()) {
-                        $width = null;
-                    } else {
-                        $height = null;
+                        return $image->scale(height: $height);
                     }
-                }
-                return $image->resize($width, $height, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-            case 'outside':
-                // For 'outside' fit, we need both width and height
-                // If one is missing, use the image's original dimensions
-                $finalWidth = $width ?? $image->width();
-                $finalHeight = $height ?? $image->height();
-                return $image->fit($finalWidth, $finalHeight);
-        }
 
-        return $image;
+                    return $image->scale(width: $width);
+                }
+                return $image->scale(width: $width, height: $height);
+            case 'outside':
+                return $image->cover(
+                    $width ?? $image->width(),
+                    $height ?? $image->height()
+                );
+            default:
+                return $image;
+        }
     }
 
     /**
