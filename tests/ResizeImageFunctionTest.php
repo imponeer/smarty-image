@@ -17,7 +17,7 @@ use Smarty\Smarty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DomCrawler\Crawler;
 
-use function BenTools\CartesianProduct\cartesian_product;
+use function BenTools\CartesianProduct\combinations;
 
 class ResizeImageFunctionTest extends TestCase
 {
@@ -47,7 +47,7 @@ class ResizeImageFunctionTest extends TestCase
             );
         }
 
-        $combinator = cartesian_product([
+        $combinator = combinations([
             'width' => [
                 null,
                 '150',
@@ -99,6 +99,8 @@ class ResizeImageFunctionTest extends TestCase
 
             $label = [];
             foreach ($attrs as $k => $v) {
+                $v = (string) $v;
+
                 if (str_starts_with($v, 'https://') || str_starts_with($v, 'http://')) {
                     $label[] = $k . '=URL';
                 } elseif (str_starts_with($v, 'data:')) {
