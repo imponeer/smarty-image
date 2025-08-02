@@ -6,7 +6,7 @@
         "php": "^8.3",
         "smarty/smarty": "^5.0",
         "intervention/image": "^3",
-        "psr/cache": "^1.0|^2.0|^3.0",
+        "psr/cache": "^3.0",
         "ext-json": "*",
         "ext-gd": "*"
     },
@@ -22,6 +22,11 @@
             "Imponeer\\Smarty\\Extensions\\Image\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Imponeer\\Smarty\\Extensions\\Image\\Tests\\": "tests/"
+        }
+    },
     "keywords": [
         "smarty",
         "image-processing",
@@ -30,10 +35,10 @@
     ],
     "require-dev": {
         "phpunit/phpunit": "^12.0",
-        "symfony/cache": "^5.0|^6.0|^7.0",
-        "bentools/cartesian-product": "^1.3 || ^2.0",
+        "symfony/cache": "^7.0",
+        "bentools/cartesian-product": "^2.0",
         "symfony/polyfill-php80": "^1.27",
-        "symfony/dom-crawler": "^5.0|^6.0|^7.0",
+        "symfony/dom-crawler": "^7.0",
         "squizlabs/php_codesniffer": "^3.7",
         "phpstan/phpstan": "^2.0"
     },
