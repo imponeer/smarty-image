@@ -6,15 +6,24 @@ on:
       - main
 
 jobs:
+  php-versions:
+    name: Lookup PHP versions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.versions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: antfroger/php-version-action@v1
+        id: versions
+
   tests:
+    needs: php-versions
     runs-on: ubuntu-latest
     continue-on-error: false
     strategy:
       max-parallel: 3
       matrix:
-        php:
-          - 8.3
-          - 8.4
+        php: ${{ fromJSON(needs.php-versions.outputs.matrix) }}
         composer:
           - 2
     name: Test - php:${{ matrix.php }}; composer:${{ matrix.composer }}
