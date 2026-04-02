@@ -8,6 +8,7 @@ use Imponeer\Smarty\Extensions\Image\Exceptions\AttributeMustBeStringException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\BadFitValueException;
 use Imponeer\Smarty\Extensions\Image\Exceptions\RequiredArgumentException;
 use Imponeer\Smarty\Extensions\Image\SmartyImageExtension;
+use Intervention\Image\Exceptions\FileNotFoundException;
 use Intervention\Image\Exceptions\DecoderException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -175,7 +176,7 @@ class ResizeImageFunctionTest extends TestCase
                 ($attrs['basedir'] ?? $_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . $attrs['file']
             )
         ) {
-            $this->expectException(DecoderException::class);
+            $this->expectException(FileNotFoundException::class);
         }
 
         $ret = $this->smarty->fetch('eval:urlencode:' . $src);
