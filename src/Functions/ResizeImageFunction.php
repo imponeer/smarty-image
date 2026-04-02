@@ -178,7 +178,7 @@ class ResizeImageFunction implements FunctionHandlerInterface
      */
     protected function doResize(string $method, string $file, ?int $width, ?int $height): ImageInterface
     {
-        $image = $this->imageManager->read($file);
+        $image = $this->imageManager->decode($file);
 
         switch ($method) {
             case 'fill':

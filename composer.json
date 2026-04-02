@@ -5,7 +5,7 @@
     "require": {
         "php": "^8.3",
         "smarty/smarty": "^5.0",
-        "intervention/image": "^3",
+        "intervention/image": "^4",
         "psr/cache": "^3.0",
         "ext-json": "*",
         "ext-gd": "*"
